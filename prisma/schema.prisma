@@ -1,0 +1,66 @@
+// Datasource and generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum OrderStatus {
+  PENDING
+  FULFILLED
+  CANCELLED
+}
+
+// Models
+model InventoryItem {
+  id        Int              @id @default(autoincrement())
+  name      String
+  sku       String           @unique
+  type      String
+  unit      String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  stocks    InventoryStock[]
+  orderItems OrderItem[]
+}
+
+model InventoryStock {
+  id        Int           @id @default(autoincrement())
+  itemId    Int
+  location  String
+  quantity  Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([location])
+  @@unique([itemId, location])
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  orderNumber String      @unique
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id        Int           @id @default(autoincrement())
+  orderId   Int
+  itemId    Int
+  quantity  Int
+
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  item      InventoryItem @relation(fields: [itemId], references: [id])
+
+  @@index([orderId])
+  @@index([itemId])
+}
