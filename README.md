@@ -171,7 +171,3 @@ If API key is enabled:
 - Basic API key guard optional via `API_KEY`
 - Minimal business rules to keep the implementation focused
 
-### Tests (Optional)
-
-Service logic is structured to be testable. Add Jest and write unit tests for `OrdersService` reservation logic if desired.
-
